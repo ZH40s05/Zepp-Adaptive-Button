@@ -10,11 +10,11 @@
 
 **zabt** 将 ZeppOS 手表物理按键与触摸屏按钮融合，提供五大功能：
 
-1. **按键融合** — 物理按键产生与触屏相同的视觉效果（高亮、按下色）
-2. **焦点导航** — UP/DOWN 在按钮间导航，SELECT/HOME 确认触发
-3. **防回弹** — 弹窗按钮 `antiBounce: true` 阻止残留事件重复触发
-4. **触屏同步** — 触屏点击按钮后自动移动按键焦点
-5. **焦点跟随滚动** — 自由滚动/Swiper 翻页时自动滚动至聚焦按钮（含平滑动画）
+1. **焦点高亮** — 按键导航时按钮显示高亮色，清楚指示当前选中
+2. **按下动画** — SELECT/HOME 按下时按钮显示按下色，抬起恢复（物理按键 + 触屏同款视觉）
+3. **超时撤销** — 按住 SELECT 超过 1 秒自动取消，日志输出按钮文字
+4. **触屏焦点同步** — 触屏点击按钮后按键焦点自动移动到该按钮
+5. **焦点跟随滚动** — 自由滚动/Swiper 翻页时自动滚动至聚焦按钮（含自定义平滑动画）
 
 首个 `zabtBtn()` 自动注册按键，无需手动 `onKey`。
 
@@ -137,11 +137,11 @@ zabtSetScrollConfig({ mode: 'swiper-h', pageCount: 3 })
 
 **zabt** fuses physical keys with touchscreen buttons. Five features:
 
-1. **Button Fusion** — keys produce the same visual feedback as touch (highlight, press color)
-2. **Focus Navigation** — UP/DOWN navigate buttons, SELECT/HOME confirm
-3. **Anti-Bounce** — `antiBounce: true` prevents modal double-trigger from residual events
+1. **Focus Highlight** — focused button shows highlight color during key navigation
+2. **Press Animation** — SELECT/HOME shows press color on hold, restores on release (same visual as touch)
+3. **Hold-to-Cancel** — holding SELECT > 1s cancels the action, logs button text
 4. **Touch-Focus Sync** — touching a button moves key focus to it
-5. **Scroll-Aware Focus** — auto-scrolls (free scroll) or auto-flips (swiper) to keep focused button visible, with custom smooth animation
+5. **Scroll-Aware Focus** — auto-scrolls (free) or auto-flips (swiper) to keep focused button visible, with custom smooth animation
 
 Keys are auto-registered on the first `zabtBtn()` call — no manual `onKey` needed.
 
