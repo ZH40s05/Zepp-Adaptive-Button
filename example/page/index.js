@@ -1,30 +1,35 @@
-import { createWidget, widget, prop } from '@zos/ui'
+import { createWidget, widget } from '@zos/ui'
 import { showToast, onKey, createModal } from '@zos/interaction'
 import { zabtBtn, zabtSetLabel, zabtSetNormalColor, zabtHandleKey, zabtUnblock } from '../utils/zabt'
-
-const GRAY = 0x9CA3AF
-const DARK = 0x374151
-const PRESS = 0x232C36
-const BLUE = 0x3B82F6
-const RED = 0xEF4444
 
 let toggleState = false
 let modalCount = 0
 
 function showInfo(title, msg, onClose) {
   let m = createModal({
-    title, text: msg,
-    textColor: GRAY, autoHide: true,
-    onClick: () => { if (m) m.show(false); zabtUnblock(); if (onClose) onClose() },
+    title,
+    text: msg,
+    textColor: 0x9CA3AF,
+    autoHide: true,
+    onClick: () => {
+      if (m) m.show(false)
+      zabtUnblock()
+      if (onClose) onClose()
+    },
   })
 }
 
 Page({
   build() {
     createWidget(widget.TEXT, {
-      x: 60, y: 10, w: 360, h: 40,
-      text: 'Button Fusion 测试',
-      text_size: 28, color: 0xFFFFFF, text_style: 2,
+      x: 60,
+      y: 10,
+      w: 360,
+      h: 40,
+      text: 'zabt Button Fusion Test',
+      text_size: 28,
+      color: 0xFFFFFF,
+      text_style: 2,
     })
 
     // =================================================================
@@ -34,84 +39,124 @@ Page({
     // Expected nav: B(0) → D(1) → C(3) → A(5) → 变色(6) → 弹窗(10)
     // =================================================================
 
-    // A: order=5, explicit focusColor=BLUE  / 显式 order + 显式高亮色
-    // ✗ no antiBounce — showToast is one-shot, no key interaction needed
-    //   showToast 是一次性提示，无需按键交互，不需要抗回弹
+    // A: explicit order=5, explicit focusColor=BLUE
+    // ✗ no antiBounce — showToast is one-shot, auto-dismiss, no key interaction
+    //   showToast 一次性提示，自动消失，无需按键交互 → 不需要抗回弹
     zabtBtn({
-      x: 60, y: 70, w: 360, h: 50,
-      radius: 12, text_size: 22,
-      normal_color: DARK, press_color: PRESS,
-      text: 'A (order=5, blue focus)', click_func: () => showToast({ content: 'A pressed' }),
-      order: 5, focusColor: BLUE,
+      x: 60,
+      y: 70,
+      w: 360,
+      h: 50,
+      radius: 12,
+      text_size: 22,
+      normal_color: 0x374151,
+      press_color: 0x232C36,
+      text: 'A (order=5, blue focus)',
+      click_func: () => showToast({ content: 'A pressed' }),
+      order: 5,
+      focusColor: 0x3B82F6,
     })
 
-    // B: auto order → 0  / 自动分配 order
-    // ✗ no antiBounce — same reason as A / 原因同 A
+    // B: auto order → 0, auto focusColor
+    // ✗ no antiBounce — same as A / 原因同 A
     zabtBtn({
-      x: 60, y: 135, w: 360, h: 50,
-      radius: 12, text_size: 22,
-      normal_color: DARK, press_color: PRESS,
-      text: 'B (auto → order=0)', click_func: () => showToast({ content: 'B pressed' }),
+      x: 60,
+      y: 135,
+      w: 360,
+      h: 50,
+      radius: 12,
+      text_size: 22,
+      normal_color: 0x374151,
+      press_color: 0x232C36,
+      text: 'B (auto → order=0)',
+      click_func: () => showToast({ content: 'B pressed' }),
     })
 
-    // C: order=3  / 显式 order=3
-    // ✗ no antiBounce — same reason as A / 原因同 A
+    // C: explicit order=3, auto focusColor
+    // ✗ no antiBounce — same as A / 原因同 A
     zabtBtn({
-      x: 60, y: 200, w: 360, h: 50,
-      radius: 12, text_size: 22,
-      normal_color: DARK, press_color: PRESS,
-      text: 'C (order=3)', click_func: () => showToast({ content: 'C pressed' }),
+      x: 60,
+      y: 200,
+      w: 360,
+      h: 50,
+      radius: 12,
+      text_size: 22,
+      normal_color: 0x374151,
+      press_color: 0x232C36,
+      text: 'C (order=3)',
+      click_func: () => showToast({ content: 'C pressed' }),
       order: 3,
     })
 
-    // D: auto order → 1  / 自动分配 order → 1
-    // ✗ no antiBounce — same reason as A / 原因同 A
+    // D: auto order → 1, auto focusColor
+    // ✗ no antiBounce — same as A / 原因同 A
     zabtBtn({
-      x: 60, y: 265, w: 360, h: 50,
-      radius: 12, text_size: 22,
-      normal_color: DARK, press_color: PRESS,
-      text: 'D (auto → order=1)', click_func: () => showToast({ content: 'D pressed' }),
+      x: 60,
+      y: 265,
+      w: 360,
+      h: 50,
+      radius: 12,
+      text_size: 22,
+      normal_color: 0x374151,
+      press_color: 0x232C36,
+      text: 'D (auto → order=1)',
+      click_func: () => showToast({ content: 'D pressed' }),
     })
 
-    // Toggle button / 变色按钮: order=5 (conflict with A → shifts to 6)
-    // ✗ no antiBounce — setProperty is pure data, no overlay to dismiss
-    //   setProperty 是纯数据变更，无叠加层需要关闭，不需要抗回弹
+    // Toggle: order=5 (conflict with A → shifts to 6)
+    // ✗ no antiBounce — setProperty is pure data change, no overlay to dismiss
+    //   setProperty 纯数据变更，无叠加层需要关闭 → 不需要抗回弹
     const toggleBtn = zabtBtn({
-      x: 60, y: 330, w: 360, h: 50,
-      radius: 12, text_size: 22,
-      normal_color: DARK, press_color: PRESS,
-      text: '变色 (order=5 conflict)', click_func: () => {
+      x: 60,
+      y: 330,
+      w: 360,
+      h: 50,
+      radius: 12,
+      text_size: 22,
+      normal_color: 0x374151,
+      press_color: 0x232C36,
+      text: '变色 (order=5 conflict)',
+      click_func: () => {
         toggleState = !toggleState
         if (toggleState) {
           zabtSetLabel(toggleBtn, '变红! 再按变回')
-          zabtSetNormalColor(toggleBtn, RED)
+          zabtSetNormalColor(toggleBtn, 0xEF4444)
         } else {
           zabtSetLabel(toggleBtn, '变色 (order=5 conflict)')
-          zabtSetNormalColor(toggleBtn, DARK)
+          zabtSetNormalColor(toggleBtn, 0x374151)
         }
       },
       order: 5,
     })
 
-    // Modal button / 弹窗按钮: order=10
+    // Modal: order=10
     // ✓ antiBounce: true — createModal opens a UI layer that consumes keys.
     //   Without antiBounce, the residual CLICK from the key press that
     //   dismisses the modal would immediately re-trigger this action.
-    //   createModal 会打开一个需要按键交互的 UI 层。不用 antiBounce 的话，
-    //   关闭弹窗的按键产生的残留 CLICK 会立即重新触发这个按钮。
+    //   createModal 打开一个消耗按键的 UI 层。
+    //   不用 antiBounce 的话，关闭弹窗的残留 CLICK 会立即重新触发。
     const MODAL_LABEL = '弹窗 (order=10, 测试block)'
     const modalBtn = zabtBtn({
-      x: 60, y: 395, w: 360, h: 50,
-      radius: 12, text_size: 22,
-      normal_color: DARK, press_color: PRESS,
-      text: MODAL_LABEL, click_func: () => {
+      x: 60,
+      y: 395,
+      w: 360,
+      h: 50,
+      radius: 12,
+      text_size: 22,
+      normal_color: 0x374151,
+      press_color: 0x232C36,
+      text: MODAL_LABEL,
+      click_func: () => {
         modalCount++
         zabtSetLabel(modalBtn, '弹窗 #' + modalCount + ' (阻断中…)')
-        showInfo('阻断测试 #' + modalCount, '按键已阻断\n计数: ' + modalCount + '\n关闭弹窗恢复', () => {
-          zabtSetLabel(modalBtn, MODAL_LABEL)
-        })
+        showInfo(
+          '阻断测试 #' + modalCount,
+          'Keys blocked\nCount: ' + modalCount + '\nClose to restore',
+          () => zabtSetLabel(modalBtn, MODAL_LABEL)
+        )
       },
-      order: 10, antiBounce: true,
+      order: 10,
+      antiBounce: true,
     })
 
     onKey({ callback: (key, event) => zabtHandleKey(key, event) })

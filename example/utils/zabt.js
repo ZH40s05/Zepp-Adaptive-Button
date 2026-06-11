@@ -36,8 +36,8 @@
  *      用 zabtBtn 替代 createWidget(widget.BUTTON, ...)，配置完全相同，仅多一个可选的 `order`：
  *
  *      const btn = zabtBtn({
- *        x: pw(100), y: pl(310), w: pl(280), h: pl(56),
- *        radius: pl(28), text_size: pl(28),
+ *        x: (100), y: 310, w: 280, h: 56,
+ *        radius: 28, text_size: 28,
  *        normal_color: 0x374151, press_color: 0x232C36,
  *        text: 'Button', click_func: action,
  *        order: 0,   // optional / 可选
@@ -161,8 +161,8 @@
  * // Normal button — no antiBounce needed
  * // 普通按钮 — 无需 antiBounce
  * const btn = zabtBtn({
- *   x: pw(100), y: pl(310), w: pl(280), h: pl(56),
- *   radius: pl(28), text_size: pl(28),
+ *   x: (100), y: 310, w: 280, h: 56,
+ *   radius: 28, text_size: 28,
  *   normal_color: DARK, press_color: PRESS,
  *   text: 'Confirm', click_func: () => showToast({ content: 'ok' }),
  *   order: 0,
@@ -171,8 +171,8 @@
  * // Modal button — needs antiBounce
  * // 弹窗按钮 — 需要 antiBounce
  * const infoBtn = zabtBtn({
- *   x: pw(220), y: pl(420), w: pl(40), h: pl(40),
- *   radius: pl(20), text_size: pl(22),
+ *   x: (220), y: 420, w: 40, h: 40,
+ *   radius: 20, text_size: 22,
  *   normal_color: DARK, press_color: PRESS,
  *   text: 'i', click_func: () => {
  *     let m = createModal({

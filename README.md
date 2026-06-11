@@ -27,8 +27,8 @@ import { zabtBtn, zabtHandleKey } from '../utils/zabt'
 
 // Normal button — no antiBounce needed
 const btn = zabtBtn({
-  x: pw(100), y: pl(310), w: pl(280), h: pl(56),
-  radius: pl(28), text_size: pl(28),
+  x: 100, y: 310, w: 280, h: 56,
+  radius: 28, text_size: 28,
   normal_color: 0x374151, press_color: 0x232C36,
   text: 'Confirm', click_func: () => showToast({ content: 'ok' }),
   order: 0,
@@ -36,8 +36,8 @@ const btn = zabtBtn({
 
 // Modal button — needs antiBounce
 const infoBtn = zabtBtn({
-  x: pw(220), y: pl(420), w: pl(40), h: pl(40),
-  radius: pl(20), text_size: pl(22),
+  x: 220, y: 420, w: 40, h: 40,
+  radius: 20, text_size: 22,
   normal_color: 0x374151, press_color: 0x232C36,
   text: 'i', click_func: () => {
     let m = createModal({
@@ -119,8 +119,8 @@ import { zabtBtn, zabtHandleKey } from '../utils/zabt'
 
 // 普通按钮 — 无需 antiBounce
 const btn = zabtBtn({
-  x: pw(100), y: pl(310), w: pl(280), h: pl(56),
-  radius: pl(28), text_size: pl(28),
+  x: 100, y: 310, w: 280, h: 56,
+  radius: 28, text_size: 28,
   normal_color: 0x374151, press_color: 0x232C36,
   text: '确认', click_func: () => showToast({ content: 'ok' }),
   order: 0,
@@ -128,8 +128,8 @@ const btn = zabtBtn({
 
 // 弹窗按钮 — 需要 antiBounce
 const infoBtn = zabtBtn({
-  x: pw(220), y: pl(420), w: pl(40), h: pl(40),
-  radius: pl(20), text_size: pl(22),
+  x: 220, y: 420, w: 40, h: 40,
+  radius: 20, text_size: 22,
   normal_color: 0x374151, press_color: 0x232C36,
   text: 'i', click_func: () => {
     let m = createModal({
