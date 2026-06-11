@@ -27,7 +27,7 @@ cp zabt.js your-app/utils/zabt.js
 2. 加上可选的 `order` 字段
 
 ```js
-import { zabtBtn, zabtHandleKey } from '../utils/zabt'
+import { zabtBtn } from '../utils/zabt'
 
 // 普通按钮 — 无需 antiBounce
 const btn = zabtBtn({
@@ -74,7 +74,6 @@ onKey({ callback: (key, event) => zabtHandleKey(key, event) })
 | 导出 | 说明 |
 |---|---|
 | `zabtBtn(opts)` | 创建融合按钮。接受所有 `createWidget(widget.BUTTON, ...)` 字段，外加 `order`、`focusColor`、`focusSrc`、`antiBounce`。返回原生 widget。 |
-| `zabtHandleKey(key, event)` | 按键回调，直接传给 `onKey`。 |
 | `zabtSetLabel(w, text)` | 修改按钮文字。 |
 | `zabtSetNormalColor(w, color)` | 修改 normal 态颜色（自动重算 focusColor）。 |
 | `zabtBlock()` | 手动阻断所有按键输入。 |
@@ -175,7 +174,7 @@ cp zabt.js your-app/utils/zabt.js
 2. Add the optional `order` field
 
 ```js
-import { zabtBtn, zabtHandleKey } from '../utils/zabt'
+import { zabtBtn } from '../utils/zabt'
 
 // Normal button — no antiBounce needed
 const btn = zabtBtn({
@@ -222,7 +221,6 @@ onKey({ callback: (key, event) => zabtHandleKey(key, event) })
 | Export | Description |
 |---|---|
 | `zabtBtn(opts)` | Create a fused button. Accepts all `createWidget(widget.BUTTON, ...)` fields plus `order`, `focusColor`, `focusSrc`, `antiBounce`. Returns the native widget. |
-| `zabtHandleKey(key, event)` | Key handler callback. Pass directly to `onKey`. |
 | `zabtSetLabel(w, text)` | Change button text. |
 | `zabtSetNormalColor(w, color)` | Change normal-state color (auto-recalculates focusColor). |
 | `zabtBlock()` | Manually block all key input. |

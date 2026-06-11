@@ -29,11 +29,13 @@
  *
  *   2. Import in your page:
  *      在页面中导入：
- *      import { zabtBtn, zabtHandleKey } from '../utils/zabt'
+ *      import { zabtBtn } from '../utils/zabt'
  *
  *   3. Replace createWidget(widget.BUTTON, ...) with zabtBtn(...).
  *      The config is identical except for the optional `order` field.
- *      用 zabtBtn 替代 createWidget(widget.BUTTON, ...)，配置完全相同，仅多一个可选的 `order`：
+ *      Key bindings (UP/DOWN/SELECT/HOME) are auto-registered on first use.
+ *      用 zabtBtn 替代 createWidget(widget.BUTTON, ...)，配置完全相同，仅多一个可选的 `order`。
+ *      按键绑定（UP/DOWN/SELECT/HOME）在首次使用时自动注册，无需手动调用 onKey。
  *
  *      const btn = zabtBtn({
  *        x: (100), y: 310, w: 280, h: 56,
@@ -42,10 +44,6 @@
  *        text: 'Button', click_func: action,
  *        order: 0,   // optional / 可选
  *      })
- *
- *   4. Bind key events:
- *      绑定按键事件：
- *      onKey({ callback: (key, event) => zabtHandleKey(key, event) })
  *
  * ============================================================================
  * Optional Fields / 可选参数
@@ -136,7 +134,6 @@
  * ============================================================================
  *
  *   zabtBtn(opts)              — Create a fused button / 创建融合按钮
- *   zabtHandleKey(key, event)  — Key handler, pass to onKey / 按键回调
  *   zabtSetLabel(w, text)      — Change button text / 修改按钮文字
  *   zabtSetNormalColor(w, c)   — Change normal color (auto-recalc focusColor)
  *                                修改 normal 态颜色（自动重算 focusColor）
@@ -224,12 +221,10 @@
  *   },
  *   order: 1, antiBounce: true,
  * })
- *
- * onKey({ callback: (key, event) => zabtHandleKey(key, event) })
  */
 
 import { createWidget, widget, prop } from '@zos/ui'
-import { KEY_SELECT, KEY_HOME, KEY_UP, KEY_DOWN, KEY_EVENT_CLICK, KEY_EVENT_PRESS, KEY_EVENT_RELEASE } from '@zos/interaction'
+import { onKey, KEY_SELECT, KEY_HOME, KEY_UP, KEY_DOWN, KEY_EVENT_CLICK, KEY_EVENT_PRESS, KEY_EVENT_RELEASE } from '@zos/interaction'
 import { scrollTo, getScrollTop, getSwiperIndex, swipeToIndex, setScrollMode, SCROLL_MODE_FREE, SCROLL_MODE_SWIPER, SCROLL_MODE_SWIPER_HORIZONTAL } from '@zos/page'
 
 const DEFAULT_FOCUS = 0x5B6B80
@@ -434,7 +429,13 @@ function _autoBlock() {
 
 // ---- public ----
 
+let _keyBound = false
+
 export function zabtBtn(opts) {
+  if (!_keyBound) {
+    _keyBound = true
+    onKey({ callback: (key, event) => zabtHandleKey(key, event) })
+  }
   const origAction = opts.click_func
   const w = createWidget(widget.BUTTON, {
     x: opts.x, y: opts.y, w: opts.w, h: opts.h,
