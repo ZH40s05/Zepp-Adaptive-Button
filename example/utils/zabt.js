@@ -1,6 +1,6 @@
 /**
- * zabt.js — ZeppOS Adaptive Button Library
- * ZeppOS 自适应按键融合库
+ * zabt.js — ZeppOS 自适应按键融合库
+ * ZeppOS Adaptive Button Library
  *
  * @version 1.0.0
  * @date    2026/06/11

@@ -1,100 +1,6 @@
-# zabt — ZeppOS Adaptive Button Library
+# zabt — ZeppOS 自适应按键融合库
 
-[English](#english) | [中文](#中文)
-
----
-
-## English
-
-**zabt** fuses physical key input (SELECT/HOME/UP/DOWN) with touchscreen buttons on ZeppOS watches, so that key presses produce the same visual feedback as touch — focus highlighting, press animation, hold-to-cancel, and touch-focus sync.
-
-### Installation
-
-```bash
-# Copy the library into your miniapp
-cp zabt.js your-app/utils/zabt.js
-```
-
-### Quick Start
-
-**Only 2 changes** from a normal `createWidget(widget.BUTTON, ...)`:
-
-1. Replace `createWidget(widget.BUTTON, ...)` with `zabtBtn(...)`
-2. Add the optional `order` field
-
-```js
-import { zabtBtn, zabtHandleKey } from '../utils/zabt'
-
-// Normal button — no antiBounce needed
-const btn = zabtBtn({
-  x: 100, y: 310, w: 280, h: 56,
-  radius: 28, text_size: 28,
-  normal_color: 0x374151, press_color: 0x232C36,
-  text: 'Confirm', click_func: () => showToast({ content: 'ok' }),
-  order: 0,
-})
-
-// Modal button — needs antiBounce
-const infoBtn = zabtBtn({
-  x: 220, y: 420, w: 40, h: 40,
-  radius: 20, text_size: 22,
-  normal_color: 0x374151, press_color: 0x232C36,
-  text: 'i', click_func: () => {
-    let m = createModal({
-      autoHide: true,
-      onClick: () => { m.show(false); zabtUnblock() },
-    })
-  },
-  order: 1, antiBounce: true,
-})
-
-// Bind keys
-onKey({ callback: (key, event) => zabtHandleKey(key, event) })
-```
-
-### antiBounce — When & Why
-
-**The problem:** when a key-triggered action creates a modal, the same physical key press generates a trailing CLICK event. After the modal closes, this residual CLICK re-triggers the action.
-
-**The solution:** `antiBounce: true` blocks key input after the action executes. Call `zabtUnblock()` in the modal's onClose — it unblocks and discards one residual confirm event.
-
-| ✅ Use antiBounce | ❌ Don't use antiBounce |
-|---|---|
-| `createModal` | `showToast` (auto-dismiss, no key interaction) |
-| Any UI layer that consumes keys | `launchApp` (page navigates away) |
-| | `setProperty` / state toggle (pure data) |
-| | `console.log` (no UI side effects) |
-
-### API
-
-| Export | Description |
-|---|---|
-| `zabtBtn(opts)` | Create a fused button. Accepts all `createWidget(widget.BUTTON, ...)` fields plus `order`, `focusColor`, `focusSrc`, `antiBounce`. Returns the native widget. |
-| `zabtHandleKey(key, event)` | Key handler callback. Pass directly to `onKey`. |
-| `zabtSetLabel(w, text)` | Change button text. |
-| `zabtSetNormalColor(w, color)` | Change normal-state color (auto-recalculates focusColor). |
-| `zabtBlock()` | Manually block all key input. |
-| `zabtUnblock()` | Unblock + discard one residual confirm event. |
-
-### Optional Fields
-
-| Field | Description |
-|---|---|
-| `order` | Navigation sequence. Auto-assigned by creation order if omitted; conflicts shift later-created buttons. |
-| `focusColor` | Highlight background color. Auto-calculated from `normal_color` (+0x28 per channel) if omitted. |
-| `focusSrc` | Highlight image (image buttons only). Falls back to "未定义高亮" text. |
-| `antiBounce` | `true` for buttons that create modals/popups. Default `false`. |
-
-### Behavior
-
-- No focus + SELECT → triggers smallest-order button
-- No focus + UP → selects smallest-order button
-- No focus + DOWN → selects second-smallest-order button
-- Navigation wraps at boundaries
-- SELECT held > 1s → cancelled (logs button text)
-- Touch-click → execute + move internal focus (no highlight); subsequent keys restore highlight
-
----
+[中文](#中文) | [English](#english)
 
 ## 中文
 
@@ -207,3 +113,95 @@ All coordinates are raw px for 480×480 round screens. No external UI library ne
 ## License
 
 MIT © 2026 ZHAO
+
+## English
+
+**zabt** fuses physical key input (SELECT/HOME/UP/DOWN) with touchscreen buttons on ZeppOS watches, so that key presses produce the same visual feedback as touch — focus highlighting, press animation, hold-to-cancel, and touch-focus sync.
+
+### Installation
+
+```bash
+# Copy the library into your miniapp
+cp zabt.js your-app/utils/zabt.js
+```
+
+### Quick Start
+
+**Only 2 changes** from a normal `createWidget(widget.BUTTON, ...)`:
+
+1. Replace `createWidget(widget.BUTTON, ...)` with `zabtBtn(...)`
+2. Add the optional `order` field
+
+```js
+import { zabtBtn, zabtHandleKey } from '../utils/zabt'
+
+// Normal button — no antiBounce needed
+const btn = zabtBtn({
+  x: 100, y: 310, w: 280, h: 56,
+  radius: 28, text_size: 28,
+  normal_color: 0x374151, press_color: 0x232C36,
+  text: 'Confirm', click_func: () => showToast({ content: 'ok' }),
+  order: 0,
+})
+
+// Modal button — needs antiBounce
+const infoBtn = zabtBtn({
+  x: 220, y: 420, w: 40, h: 40,
+  radius: 20, text_size: 22,
+  normal_color: 0x374151, press_color: 0x232C36,
+  text: 'i', click_func: () => {
+    let m = createModal({
+      autoHide: true,
+      onClick: () => { m.show(false); zabtUnblock() },
+    })
+  },
+  order: 1, antiBounce: true,
+})
+
+// Bind keys
+onKey({ callback: (key, event) => zabtHandleKey(key, event) })
+```
+
+### antiBounce — When & Why
+
+**The problem:** when a key-triggered action creates a modal, the same physical key press generates a trailing CLICK event. After the modal closes, this residual CLICK re-triggers the action.
+
+**The solution:** `antiBounce: true` blocks key input after the action executes. Call `zabtUnblock()` in the modal's onClose — it unblocks and discards one residual confirm event.
+
+| ✅ Use antiBounce | ❌ Don't use antiBounce |
+|---|---|
+| `createModal` | `showToast` (auto-dismiss, no key interaction) |
+| Any UI layer that consumes keys | `launchApp` (page navigates away) |
+| | `setProperty` / state toggle (pure data) |
+| | `console.log` (no UI side effects) |
+
+### API
+
+| Export | Description |
+|---|---|
+| `zabtBtn(opts)` | Create a fused button. Accepts all `createWidget(widget.BUTTON, ...)` fields plus `order`, `focusColor`, `focusSrc`, `antiBounce`. Returns the native widget. |
+| `zabtHandleKey(key, event)` | Key handler callback. Pass directly to `onKey`. |
+| `zabtSetLabel(w, text)` | Change button text. |
+| `zabtSetNormalColor(w, color)` | Change normal-state color (auto-recalculates focusColor). |
+| `zabtBlock()` | Manually block all key input. |
+| `zabtUnblock()` | Unblock + discard one residual confirm event. |
+
+### Optional Fields
+
+| Field | Description |
+|---|---|
+| `order` | Navigation sequence. Auto-assigned by creation order if omitted; conflicts shift later-created buttons. |
+| `focusColor` | Highlight background color. Auto-calculated from `normal_color` (+0x28 per channel) if omitted. |
+| `focusSrc` | Highlight image (image buttons only). Falls back to "未定义高亮" text. |
+| `antiBounce` | `true` for buttons that create modals/popups. Default `false`. |
+
+### Behavior
+
+- No focus + SELECT → triggers smallest-order button
+- No focus + UP → selects smallest-order button
+- No focus + DOWN → selects second-smallest-order button
+- Navigation wraps at boundaries
+- SELECT held > 1s → cancelled (logs button text)
+- Touch-click → execute + move internal focus (no highlight); subsequent keys restore highlight
+
+---
