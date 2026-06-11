@@ -1,6 +1,6 @@
 /**
- * zabt.js — ZeppOS 自适应按键融合库
- * ZeppOS Adaptive Button Library
+ * zabt.js — ZeppOS Adaptive Button Library
+ * ZeppOS 自适应按键融合库
  *
  * @version 1.0.0
  * @date    2026/06/11
@@ -140,9 +140,51 @@
  *   zabtSetLabel(w, text)      — Change button text / 修改按钮文字
  *   zabtSetNormalColor(w, c)   — Change normal color (auto-recalc focusColor)
  *                                修改 normal 态颜色（自动重算 focusColor）
+ *   zabtSetScrollConfig(cfg)   — Enable scroll-aware focus + auto system setup
+ *                                启用焦点跟随滚动 + 自动系统配置
  *   zabtBlock()                — Manually block key input / 手动阻断按键
  *   zabtUnblock()              — Unblock + discard one residual confirm event
  *                                释放阻断 + 丢弃一次残留确认事件
+ *
+ * ============================================================================
+ * Scroll-Aware Focus / 焦点跟随滚动
+ * ============================================================================
+ *
+ * [EN] zabtSetScrollConfig replaces manual setScrollMode calls. It configures
+ * both the system scroll mode AND the button focus tracking in one call.
+ *
+ * [CN] zabtSetScrollConfig 替代手动 setScrollMode 调用。一次调用同时配置系统
+ * 滚动模式和按钮焦点追踪。
+ *
+ * Four page modes / 四种页面模式:
+ *
+ *   1. LOCKED (default) — no config, all content on one screen
+ *      锁定不滚动（默认）— 不调用，内容在一屏内
+ *
+ *   2. FREE SCROLL — page scrolls freely, focus stays in safe zone
+ *      zabtSetScrollConfig({ mode: 'free', screenHeight: 480 })
+ *      自由滚动 — 页面自由滚动，焦点保持在安全区(1/6~5/6 屏幕)
+ *
+ *   3. SWIPER VERTICAL — page flips vertically, auto-flip on focus
+ *      zabtSetScrollConfig({ mode: 'swiper', screenHeight: 480, pageSize: 480, pageCount: 3 })
+ *      纵向翻页 — 页面纵向翻页，焦点跨页时自动翻页
+ *
+ *   4. SWIPER HORIZONTAL — page flips horizontally, auto-flip on focus
+ *      zabtSetScrollConfig({ mode: 'swiper-h', screenHeight: 480, pageSize: 480, pageCount: 3 })
+ *      横向翻页 — 页面横向翻页，焦点跨页时自动翻页
+ *
+ * Config fields / 配置字段:
+ *   mode         — 'free' | 'swiper' | 'swiper-h'
+ *   screenHeight — device screen height (required for free/swiper)
+ *   pageSize     — swiper page height/width (default: screenHeight)
+ *   pageCount    — number of swiper pages (default: 1)
+ *
+ * @example
+ * // Free scroll / 自由滚动
+ * zabtSetScrollConfig({ mode: 'free', screenHeight: 480 })
+ *
+ * // Swiper horizontal / 横向翻页
+ * zabtSetScrollConfig({ mode: 'swiper-h', screenHeight: 480, pageSize: 480, pageCount: 3 })
  *
  * ============================================================================
  * Behavior Rules / 行为规则
@@ -188,6 +230,7 @@
 
 import { createWidget, widget, prop } from '@zos/ui'
 import { KEY_SELECT, KEY_HOME, KEY_UP, KEY_DOWN, KEY_EVENT_CLICK, KEY_EVENT_PRESS, KEY_EVENT_RELEASE } from '@zos/interaction'
+import { scrollTo, getScrollTop, getSwiperIndex, swipeToIndex, setScrollMode, SCROLL_MODE_FREE, SCROLL_MODE_SWIPER, SCROLL_MODE_SWIPER_HORIZONTAL } from '@zos/page'
 
 const DEFAULT_FOCUS = 0x5B6B80
 const NO_FOCUS_IMG = '未定义高亮'
@@ -199,6 +242,9 @@ let _pressing = false
 let _blocked = false
 let _skipConfirm = false  // unblock 后丢弃下一次确认
 let _skipTimer = null
+let _scrollCfg = null    // { mode, screenHeight, pageHeight }
+let _trackedST = null    // tracked scroll target, avoids animation jitter / 跟踪滚动目标避免动画跳动
+let _scrollAnim = null    // smooth scroll interval id / 平滑滚动定时器 ID
 let _finalized = false
 let _pressTimer = null
 let _cancelled = false
@@ -274,6 +320,86 @@ function _navigate(dir) {
   }
   _focusVisible = true
   _syncAll()
+  _ensureVisible(dir)
+}
+
+function _startScrollAnim(target) {
+  if (_scrollAnim) clearInterval(_scrollAnim)
+  let current = -getScrollTop()
+  const step = () => {
+    current += (target - current) * 0.35
+    if (Math.abs(target - current) < 0.5) {
+      current = target
+      clearInterval(_scrollAnim)
+      _scrollAnim = null
+    }
+    scrollTo({ y: -Math.round(current) })
+  }
+  _scrollAnim = setInterval(step, 16)
+  step()
+}
+
+function _ensureVisible(dir) {
+  if (!_scrollCfg || _focusIdx === null) return
+  const btn = _entries[_focusIdx]
+  const sh = _scrollCfg.screenHeight
+
+  if (_scrollCfg.mode === 'free') {
+    if (_trackedST === null) _trackedST = -getScrollTop()
+    const st = _trackedST
+    const btnTop = btn.opts.y
+    const btnBottom = btn.opts.y + btn.opts.h
+
+    const safeTop = st + sh / 6
+    const safeBottom = st + sh * 5 / 6
+
+    // Only skip if button is within the safe zone, not just anywhere in viewport
+    // 按钮已在安全区内才跳过，不是整个视窗都算
+    if (btnTop >= safeTop && btnBottom <= safeBottom) return
+
+    let targetST
+    if (dir > 0) {
+      // DOWN: ensure bottom edge above 5/6 / 优先保证底边在 5/6 以上
+      targetST = btnBottom - sh * 5 / 6
+      if (btnTop < targetST + sh / 6) {
+        targetST = btnTop - sh / 6
+      }
+    } else {
+      // UP: ensure top edge below 1/6 / 优先保证顶边在 1/6 以下
+      targetST = btnTop - sh / 6
+      if (btnBottom > targetST + sh * 5 / 6) {
+        targetST = btnBottom - sh * 5 / 6
+      }
+    }
+
+    // Clamp: topmost button at screen/2, bottommost at screen/2 / 边界限制
+    let minBtnTop = Infinity, maxBtnBottom = 0
+    for (let i = 0; i < _entries.length; i++) {
+      const t = _entries[i].opts.y
+      const b = t + _entries[i].opts.h
+      if (t < minBtnTop) minBtnTop = t
+      if (b > maxBtnBottom) maxBtnBottom = b
+    }
+    const minST = Math.max(0, minBtnTop - sh / 2)
+    const maxST = Math.max(0, maxBtnBottom - sh / 2)
+    if (targetST < minST) targetST = minST
+    if (targetST > maxST) targetST = maxST
+
+    _trackedST = targetST
+    _startScrollAnim(targetST)
+  }
+
+  if (_scrollCfg.mode === 'swiper' || _scrollCfg.mode === 'swiper-h') {
+    // swiper-h uses x-based page calculation / 横向翻页用 x 算页号
+    const useX = _scrollCfg.mode === 'swiper-h'
+    const pageSize = _scrollCfg.pageSize || sh
+    const pos = useX ? btn.opts.x : btn.opts.y
+    const targetPage = Math.floor(pos / pageSize)
+    const curPage = getSwiperIndex() - 1
+    if (targetPage !== curPage) {
+      swipeToIndex({ index: targetPage })
+    }
+  }
 }
 
 function _finalize() {
@@ -398,6 +524,26 @@ export function zabtHandleKey(key, event) {
   }
 
   return false
+}
+
+export function zabtSetScrollConfig(cfg) {
+  _scrollCfg = cfg
+  _trackedST = null
+
+  // Auto-configure system scroll mode / 自动配置系统滚动模式
+  if (cfg.mode === 'free') {
+    setScrollMode({ mode: SCROLL_MODE_FREE })
+  } else if (cfg.mode === 'swiper') {
+    setScrollMode({
+      mode: SCROLL_MODE_SWIPER,
+      options: { height: cfg.pageSize || cfg.screenHeight, count: cfg.pageCount || 1 },
+    })
+  } else if (cfg.mode === 'swiper-h') {
+    setScrollMode({
+      mode: SCROLL_MODE_SWIPER_HORIZONTAL,
+      options: { width: cfg.pageSize || cfg.screenWidth || 480, count: cfg.pageCount || 1 },
+    })
+  }
 }
 
 export function zabtBlock()   { _blocked = true }

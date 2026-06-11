@@ -98,6 +98,38 @@ onKey({ callback: (key, event) => zabtHandleKey(key, event) })
 - SELECT 按住超过 1s → 超时撤销（日志输出按钮文字）
 - 触屏点击 → 执行动作 + 内部移动焦点（不显示高亮），之后按键恢复高亮
 
+
+### Scroll-Aware Focus / 焦点跟随滚动
+
+**zabtSetScrollConfig** replaces manual `setScrollMode` — one call configures both the system scroll mode and button focus tracking.
+
+**zabtSetScrollConfig** 替代手动 `setScrollMode` — 一次调用同时配置系统滚动模式和按钮焦点追踪。
+
+#### Four page modes / 四种页面模式
+
+| Mode / 模式 | Config | Behavior / 行为 |
+|---|---|---|
+| **Locked** 锁定不滚动 | (no call / 不调用) | Content fits one screen / 内容在一屏内 |
+| **Free scroll** 自由滚动 | `{ mode: 'free', screenHeight: 480 }` | Focus stays in safe zone (1/6~5/6), smooth scroll animation / 焦点保持在安全区，平滑滚动 |
+| **Swiper V** 纵向翻页 | `{ mode: 'swiper', screenHeight: 480, pageSize: 480, pageCount: 3 }` | Auto-flip to page containing focused button / 焦点跨页自动翻页 |
+| **Swiper H** 横向翻页 | `{ mode: 'swiper-h', screenHeight: 480, pageSize: 480, pageCount: 3 }` | Auto-flip to page containing focused button / 焦点跨页自动翻页 |
+
+```
+
+```js
+// Free scroll / 自由滚动
+Page({ build() {
+  zabtSetScrollConfig({ mode: 'free', screenHeight: 480 })
+  // ... zabtBtn(...) ...
+}})
+
+// Swiper / 翻页
+Page({ build() {
+  zabtSetScrollConfig({ mode: 'swiper', screenHeight: 480, pageSize: 480, pageCount: 3 })
+  // ... zabtBtn(...) ...
+}})
+```
+
 ## Example / 示例
 
 The [example/](example/) directory is a **self-contained** test app — just copy it and run `zeus build`.

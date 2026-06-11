@@ -15,7 +15,7 @@
   },
   "targets": {
     "default": {
-      "module": { "page": { "pages": ["page/index"] } },
+      "module": { "page": { "pages": ["page/index", "page/basic", "page/scroll", "page/swiper-h", "page/swiper-v"] } },
       "platforms": [{ "st": "r", "dw": 480 }]
     }
   },

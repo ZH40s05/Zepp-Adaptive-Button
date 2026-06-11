@@ -1,0 +1,97 @@
+import { createWidget, widget } from '@zos/ui'
+import { showToast, onKey, createModal } from '@zos/interaction'
+import { back } from '@zos/router'
+import { zabtBtn, zabtSetScrollConfig, zabtHandleKey } from '../utils/zabt'
+
+const SH = 480
+const SW = 480
+
+Page({
+  build() {
+    // =================================================================
+    // Page mode: SWIPER HORIZONTAL / 横向翻页
+    // 3 pages side by side, 480px each. Buttons on different pages.
+    // Navigating to a button on another page auto-flips to that page.
+    // zabtSetScrollConfig handles both system setup + focus tracking.
+    // 3 页并排，每页 480px。导航到其他页按钮时自动翻页。
+    // =================================================================
+    zabtSetScrollConfig({ mode: 'swiper-h', screenHeight: 480, pageSize: 480, pageCount: 3 })
+
+    createWidget(widget.TEXT, {
+      x: 30, y: 20, w: 420, h: 36,
+      text: 'Swiper Test / 翻页测试',
+      text_size: 26, color: 0xFFFFFF, text_style: 2,
+    })
+
+    // Page indicator / 页码指示
+    createWidget(widget.TEXT, {
+      x: 30, y: 60, w: 420, h: 24,
+      text: '3 pages, press UP/DOWN to navigate',
+      text_size: 16, color: 0x9CA3AF, text_style: 2,
+    })
+
+    // Page 0 (x=0..480): 2 buttons / 第0页
+    zabtBtn({
+      x: 60, y: 120, w: 360, h: 80,
+      radius: 16, text_size: 24,
+      normal_color: 0x374151, press_color: 0x232C36,
+      text: 'Page 0 — BTN 0',
+      click_func: () => showToast({ content: 'Page 0 Btn 0' }),
+      order: 0,
+    })
+    zabtBtn({
+      x: 60, y: 230, w: 360, h: 80,
+      radius: 16, text_size: 24,
+      normal_color: 0x374151, press_color: 0x232C36,
+      text: 'Page 0 — BTN 1',
+      click_func: () => showToast({ content: 'Page 0 Btn 1' }),
+      order: 1,
+    })
+
+    // Page 1 (x=480..960): 2 buttons / 第1页
+    zabtBtn({
+      x: 540, y: 120, w: 360, h: 80,
+      radius: 16, text_size: 24,
+      normal_color: 0x374151, press_color: 0x232C36,
+      text: 'Page 1 — BTN 2',
+      click_func: () => showToast({ content: 'Page 1 Btn 2' }),
+      order: 2,
+    })
+    zabtBtn({
+      x: 540, y: 230, w: 360, h: 80,
+      radius: 16, text_size: 24,
+      normal_color: 0x374151, press_color: 0x232C36,
+      text: 'Page 1 — BTN 3',
+      click_func: () => showToast({ content: 'Page 1 Btn 3' }),
+      order: 3,
+    })
+
+    // Page 2 (x=960..1440): 2 buttons + Back / 第2页
+    zabtBtn({
+      x: 1020, y: 120, w: 360, h: 80,
+      radius: 16, text_size: 24,
+      normal_color: 0x374151, press_color: 0x232C36,
+      text: 'Page 2 — BTN 4',
+      click_func: () => showToast({ content: 'Page 2 Btn 4' }),
+      order: 4,
+    })
+    zabtBtn({
+      x: 1020, y: 230, w: 360, h: 80,
+      radius: 16, text_size: 24,
+      normal_color: 0x374151, press_color: 0x232C36,
+      text: 'Page 2 — BTN 5',
+      click_func: () => showToast({ content: 'Page 2 Btn 5' }),
+      order: 5,
+    })
+    zabtBtn({
+      x: 1020, y: 370, w: 360, h: 80,
+      radius: 16, text_size: 24,
+      normal_color: 0x1F2937, press_color: 0x111827,
+      text: 'Back / 返回',
+      click_func: () => back(),
+      order: 99, antiBounce: true,
+    })
+
+    onKey({ callback: (key, event) => zabtHandleKey(key, event) })
+  },
+})

@@ -1,162 +1,87 @@
 import { createWidget, widget } from '@zos/ui'
-import { showToast, onKey, createModal } from '@zos/interaction'
-import { zabtBtn, zabtSetLabel, zabtSetNormalColor, zabtHandleKey, zabtUnblock } from '../utils/zabt'
-
-let toggleState = false
-let modalCount = 0
-
-function showInfo(title, msg, onClose) {
-  let m = createModal({
-    title,
-    text: msg,
-    textColor: 0x9CA3AF,
-    autoHide: true,
-    onClick: () => {
-      if (m) m.show(false)
-      zabtUnblock()
-      if (onClose) onClose()
-    },
-  })
-}
+import { onKey } from '@zos/interaction'
+import { push } from '@zos/router'
+import { zabtBtn, zabtSetScrollConfig, zabtHandleKey } from '../utils/zabt'
 
 Page({
   build() {
+    // =================================================================
+    // Page mode: FREE SCROLL / 自由滚动
+    // Buttons stay in safe zone (1/6 ~ 5/6 of screen) during key nav.
+    // Also enables custom smooth scroll animation.
+    // 按键导航时按钮保持在屏幕安全区 (1/6 ~ 5/6)，含自定义平滑滚动动画。
+    // =================================================================
+    zabtSetScrollConfig({ mode: 'free', screenHeight: 480 })
+
     createWidget(widget.TEXT, {
-      x: 60,
-      y: 10,
-      w: 360,
-      h: 40,
-      text: 'zabt Button Fusion Test',
-      text_size: 28,
-      color: 0xFFFFFF,
-      text_style: 2,
+      x: 60, y: 30, w: 360, h: 40,
+      text: 'zabt Demo',
+      text_size: 32, color: 0xFFFFFF, text_style: 2,
+    })
+    createWidget(widget.TEXT, {
+      x: 60, y: 70, w: 360, h: 24,
+      text: 'ZeppOS Adaptive Button Library',
+      text_size: 16, color: 0x9CA3AF, text_style: 2,
     })
 
-    // =================================================================
-    // Order assignment test / 顺序分配测试
-    // Explicit: C=3, A=5, 变色=5(conflict→6), 弹窗=10
-    // Auto-fill: B→0, D→1
-    // Expected nav: B(0) → D(1) → C(3) → A(5) → 变色(6) → 弹窗(10)
-    // =================================================================
-
-    // A: explicit order=5, explicit focusColor=BLUE
-    // ✗ no antiBounce — showToast is one-shot, auto-dismiss, no key interaction
-    //   showToast 一次性提示，自动消失，无需按键交互 → 不需要抗回弹
+    // Basic features / 基础功能
     zabtBtn({
-      x: 60,
-      y: 70,
-      w: 360,
-      h: 50,
-      radius: 12,
-      text_size: 22,
-      normal_color: 0x374151,
-      press_color: 0x232C36,
-      text: 'A (order=5, blue focus)',
-      click_func: () => showToast({ content: 'A pressed' }),
-      order: 5,
-      focusColor: 0x3B82F6,
+      x: 60, y: 120, w: 360, h: 55,
+      radius: 12, text_size: 22,
+      normal_color: 0x374151, press_color: 0x232C36,
+      text: 'Basic / 基础功能',
+      click_func: () => push({ url: 'page/basic' }),
+      order: 0,
+    })
+    createWidget(widget.TEXT, {
+      x: 80, y: 178, w: 320, h: 22,
+      text: 'order, focusColor, antiBounce, modal',
+      text_size: 15, color: 0x6B7280, text_style: 2,
     })
 
-    // B: auto order → 0, auto focusColor
-    // ✗ no antiBounce — same as A / 原因同 A
+    // Free scroll / 自由滚动
     zabtBtn({
-      x: 60,
-      y: 135,
-      w: 360,
-      h: 50,
-      radius: 12,
-      text_size: 22,
-      normal_color: 0x374151,
-      press_color: 0x232C36,
-      text: 'B (auto → order=0)',
-      click_func: () => showToast({ content: 'B pressed' }),
+      x: 60, y: 215, w: 360, h: 55,
+      radius: 12, text_size: 22,
+      normal_color: 0x374151, press_color: 0x232C36,
+      text: 'Scroll / 滚动测试',
+      click_func: () => push({ url: 'page/scroll' }),
+      order: 1,
+    })
+    createWidget(widget.TEXT, {
+      x: 80, y: 273, w: 320, h: 22,
+      text: 'free scroll, auto-scroll-to-focus',
+      text_size: 15, color: 0x6B7280, text_style: 2,
     })
 
-    // C: explicit order=3, auto focusColor
-    // ✗ no antiBounce — same as A / 原因同 A
+    // Horizontal swiper / 横向翻页
     zabtBtn({
-      x: 60,
-      y: 200,
-      w: 360,
-      h: 50,
-      radius: 12,
-      text_size: 22,
-      normal_color: 0x374151,
-      press_color: 0x232C36,
-      text: 'C (order=3)',
-      click_func: () => showToast({ content: 'C pressed' }),
+      x: 60, y: 310, w: 360, h: 55,
+      radius: 12, text_size: 22,
+      normal_color: 0x374151, press_color: 0x232C36,
+      text: 'Swiper-H / 横向翻页',
+      click_func: () => push({ url: 'page/swiper-h' }),
+      order: 2,
+    })
+    createWidget(widget.TEXT, {
+      x: 80, y: 368, w: 320, h: 22,
+      text: 'horizontal swiper, auto-page-flip',
+      text_size: 15, color: 0x6B7280, text_style: 2,
+    })
+
+    // Vertical swiper / 纵向翻页
+    zabtBtn({
+      x: 60, y: 405, w: 360, h: 55,
+      radius: 12, text_size: 22,
+      normal_color: 0x374151, press_color: 0x232C36,
+      text: 'Swiper-V / 纵向翻页',
+      click_func: () => push({ url: 'page/swiper-v' }),
       order: 3,
     })
-
-    // D: auto order → 1, auto focusColor
-    // ✗ no antiBounce — same as A / 原因同 A
-    zabtBtn({
-      x: 60,
-      y: 265,
-      w: 360,
-      h: 50,
-      radius: 12,
-      text_size: 22,
-      normal_color: 0x374151,
-      press_color: 0x232C36,
-      text: 'D (auto → order=1)',
-      click_func: () => showToast({ content: 'D pressed' }),
-    })
-
-    // Toggle: order=5 (conflict with A → shifts to 6)
-    // ✗ no antiBounce — setProperty is pure data change, no overlay to dismiss
-    //   setProperty 纯数据变更，无叠加层需要关闭 → 不需要抗回弹
-    const toggleBtn = zabtBtn({
-      x: 60,
-      y: 330,
-      w: 360,
-      h: 50,
-      radius: 12,
-      text_size: 22,
-      normal_color: 0x374151,
-      press_color: 0x232C36,
-      text: '变色 (order=5 conflict)',
-      click_func: () => {
-        toggleState = !toggleState
-        if (toggleState) {
-          zabtSetLabel(toggleBtn, '变红! 再按变回')
-          zabtSetNormalColor(toggleBtn, 0xEF4444)
-        } else {
-          zabtSetLabel(toggleBtn, '变色 (order=5 conflict)')
-          zabtSetNormalColor(toggleBtn, 0x374151)
-        }
-      },
-      order: 5,
-    })
-
-    // Modal: order=10
-    // ✓ antiBounce: true — createModal opens a UI layer that consumes keys.
-    //   Without antiBounce, the residual CLICK from the key press that
-    //   dismisses the modal would immediately re-trigger this action.
-    //   createModal 打开一个消耗按键的 UI 层。
-    //   不用 antiBounce 的话，关闭弹窗的残留 CLICK 会立即重新触发。
-    const MODAL_LABEL = '弹窗 (order=10, 测试block)'
-    const modalBtn = zabtBtn({
-      x: 60,
-      y: 395,
-      w: 360,
-      h: 50,
-      radius: 12,
-      text_size: 22,
-      normal_color: 0x374151,
-      press_color: 0x232C36,
-      text: MODAL_LABEL,
-      click_func: () => {
-        modalCount++
-        zabtSetLabel(modalBtn, '弹窗 #' + modalCount + ' (阻断中…)')
-        showInfo(
-          '阻断测试 #' + modalCount,
-          'Keys blocked\nCount: ' + modalCount + '\nClose to restore',
-          () => zabtSetLabel(modalBtn, MODAL_LABEL)
-        )
-      },
-      order: 10,
-      antiBounce: true,
+    createWidget(widget.TEXT, {
+      x: 80, y: 463, w: 320, h: 22,
+      text: 'vertical swiper, auto-page-flip',
+      text_size: 15, color: 0x6B7280, text_style: 2,
     })
 
     onKey({ callback: (key, event) => zabtHandleKey(key, event) })
