@@ -1,0 +1,31 @@
+{
+  "name": "@zh40s05/zepp-adaptive-button",
+  "version": "1.0.0",
+  "description": "ZeppOS 自适应按键融合库 — 物理按键与触摸屏按钮融合 / Fuse physical keys with touchscreen buttons",
+  "main": "zabt.js",
+  "files": [
+    "zabt.js",
+    "example/"
+  ],
+  "directories": {
+    "example": "example"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ZH40s05/Zepp-Adaptive-Button.git"
+  },
+  "keywords": [
+    "ZeppOS",
+    "button",
+    "key",
+    "fusion",
+    "watch",
+    "Amazfit"
+  ],
+  "author": "ZHAO",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ZH40s05/Zepp-Adaptive-Button/issues"
+  },
+  "homepage": "https://github.com/ZH40s05/Zepp-Adaptive-Button#readme"
+}

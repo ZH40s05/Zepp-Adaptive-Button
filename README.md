@@ -9,7 +9,13 @@
 ### 安装
 
 ```bash
-# 复制库文件到小程序
+# pnpm（推荐）
+pnpm add @zh40s05/zepp-adaptive-button
+
+# npm
+npm install @zh40s05/zepp-adaptive-button
+
+# 或手动复制
 cp zabt.js your-app/utils/zabt.js
 ```
 
@@ -92,8 +98,6 @@ onKey({ callback: (key, event) => zabtHandleKey(key, event) })
 - SELECT 按住超过 1s → 超时撤销（日志输出按钮文字）
 - 触屏点击 → 执行动作 + 内部移动焦点（不显示高亮），之后按键恢复高亮
 
-## Example
-
 ## Example / 示例
 
 The [example/](example/) directory is a **self-contained** test app — just copy it and run `zeus build`.
@@ -121,7 +125,13 @@ MIT © 2026 ZHAO
 ### Installation
 
 ```bash
-# Copy the library into your miniapp
+# pnpm (recommended)
+pnpm add @zh40s05/zepp-adaptive-button
+
+# npm
+npm install @zh40s05/zepp-adaptive-button
+
+# or manual copy
 cp zabt.js your-app/utils/zabt.js
 ```
 
