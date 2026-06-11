@@ -1,6 +1,6 @@
 {
   "name": "@zh40s05/zepp-adaptive-button",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "ZeppOS 自适应按键融合库 — 物理按键与触摸屏按钮融合 / Fuse physical keys with touchscreen buttons",
   "main": "zabt.js",
   "files": [
