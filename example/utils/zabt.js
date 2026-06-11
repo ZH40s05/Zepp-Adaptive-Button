@@ -38,10 +38,16 @@
  *      按键绑定（UP/DOWN/SELECT/HOME）在首次使用时自动注册，无需手动调用 onKey。
  *
  *      const btn = zabtBtn({
- *        x: (100), y: 310, w: 280, h: 56,
- *        radius: 28, text_size: 28,
- *        normal_color: 0x374151, press_color: 0x232C36,
- *        text: 'Button', click_func: action,
+ *        x: 100,
+ *        y: 310,
+ *        w: 280,
+ *        h: 56,
+ *        radius: 28,
+ *        text_size: 28,
+ *        normal_color: 0x374151,
+ *        press_color: 0x232C36,
+ *        text: 'Button',
+ *        click_func: action,
  *        order: 0,   // optional / 可选
  *      })
  *
@@ -215,29 +221,40 @@
  *     触屏点击 → 执行动作 + 内部移动焦点（不显示高亮），之后按键恢复高亮
  *
  * @example
- * // Normal button — no antiBounce needed
- * // 普通按钮 — 无需 antiBounce
+ * // Normal button — no antiBounce needed / 普通按钮
  * const btn = zabtBtn({
- *   x: (100), y: 310, w: 280, h: 56,
- *   radius: 28, text_size: 28,
- *   normal_color: DARK, press_color: PRESS,
- *   text: 'Confirm', click_func: () => showToast({ content: 'ok' }),
+ *   x: 100,
+ *   y: 310,
+ *   w: 280,
+ *   h: 56,
+ *   radius: 28,
+ *   text_size: 28,
+ *   normal_color: 0x374151,
+ *   press_color: 0x232C36,
+ *   text: 'Confirm',
+ *   click_func: () => showToast({ content: 'ok' }),
  *   order: 0,
  * })
  *
- * // Modal button — needs antiBounce
- * // 弹窗按钮 — 需要 antiBounce
+ * // Modal button — needs antiBounce / 弹窗按钮
  * const infoBtn = zabtBtn({
- *   x: (220), y: 420, w: 40, h: 40,
- *   radius: 20, text_size: 22,
- *   normal_color: DARK, press_color: PRESS,
- *   text: 'i', click_func: () => {
+ *   x: 220,
+ *   y: 420,
+ *   w: 40,
+ *   h: 40,
+ *   radius: 20,
+ *   text_size: 22,
+ *   normal_color: 0x374151,
+ *   press_color: 0x232C36,
+ *   text: 'i',
+ *   click_func: () => {
  *     let m = createModal({
  *       autoHide: true,
- *       onClick: () => { m.show(false); zabtUnblock() },
+ *       onClick: () => { m.show(false); zabtUnblock() }
  *     })
  *   },
- *   order: 1, antiBounce: true,
+ *   order: 1,
+ *   antiBounce: true,
  * })
  */
 

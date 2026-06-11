@@ -36,27 +36,40 @@ cp zabt.js your-app/utils/zabt.js
 ```js
 import { zabtBtn } from '../utils/zabt'
 
-// 普通按钮
+// 普通按钮 / normal button
 const btn = zabtBtn({
-  x: 100, y: 310, w: 280, h: 56,
-  radius: 28, text_size: 28,
-  normal_color: 0x374151, press_color: 0x232C36,
-  text: '确认', click_func: () => showToast({ content: 'ok' }),
+  x: 100,
+  y: 310,
+  w: 280,
+  h: 56,
+  radius: 28,
+  text_size: 28,
+  normal_color: 0x374151,
+  press_color: 0x232C36,
+  text: '确认',
+  click_func: () => showToast({ content: 'ok' }),
   order: 0,
 })
 
-// 弹窗按钮 — antiBounce: true
+// 弹窗按钮 — antiBounce: true / modal button
 const infoBtn = zabtBtn({
-  x: 220, y: 420, w: 40, h: 40,
-  radius: 20, text_size: 22,
-  normal_color: 0x374151, press_color: 0x232C36,
-  text: 'i', click_func: () => {
+  x: 220,
+  y: 420,
+  w: 40,
+  h: 40,
+  radius: 20,
+  text_size: 22,
+  normal_color: 0x374151,
+  press_color: 0x232C36,
+  text: 'i',
+  click_func: () => {
     let m = createModal({
       autoHide: true,
-      onClick: () => { m.show(false); zabtUnblock() },
+      onClick: () => { m.show(false); zabtUnblock() }
     })
   },
-  order: 1, antiBounce: true,
+  order: 1,
+  antiBounce: true,
 })
 ```
 
@@ -160,27 +173,40 @@ cp zabt.js your-app/utils/zabt.js
 ```js
 import { zabtBtn } from '../utils/zabt'
 
-// Normal button
+// Normal button / 普通按钮
 const btn = zabtBtn({
-  x: 100, y: 310, w: 280, h: 56,
-  radius: 28, text_size: 28,
-  normal_color: 0x374151, press_color: 0x232C36,
-  text: 'Confirm', click_func: () => showToast({ content: 'ok' }),
+  x: 100,
+  y: 310,
+  w: 280,
+  h: 56,
+  radius: 28,
+  text_size: 28,
+  normal_color: 0x374151,
+  press_color: 0x232C36,
+  text: 'Confirm',
+  click_func: () => showToast({ content: 'ok' }),
   order: 0,
 })
 
-// Modal button — antiBounce: true
+// Modal button — antiBounce: true / 弹窗按钮
 const infoBtn = zabtBtn({
-  x: 220, y: 420, w: 40, h: 40,
-  radius: 20, text_size: 22,
-  normal_color: 0x374151, press_color: 0x232C36,
-  text: 'i', click_func: () => {
+  x: 220,
+  y: 420,
+  w: 40,
+  h: 40,
+  radius: 20,
+  text_size: 22,
+  normal_color: 0x374151,
+  press_color: 0x232C36,
+  text: 'i',
+  click_func: () => {
     let m = createModal({
       autoHide: true,
-      onClick: () => { m.show(false); zabtUnblock() },
+      onClick: () => { m.show(false); zabtUnblock() }
     })
   },
-  order: 1, antiBounce: true,
+  order: 1,
+  antiBounce: true,
 })
 ```
 
