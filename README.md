@@ -188,7 +188,21 @@ onKey({ callback: (key, event) => zabtHandleKey(key, event) })
 
 ## Example
 
-See the [example/](example/) directory for a complete test app that demonstrates order assignment, focusColor, dynamic label/color changes, and antiBounce with modal blocking.
+## Example / 示例
+
+The [example/](example/) directory is a **self-contained** test app — just copy it and run `zeus build`.
+
+It demonstrates:
+- `order` assignment (explicit, auto-fill, conflict resolution)
+- `focusColor` (explicit override vs auto-calculated)
+- `zabtSetLabel` / `zabtSetNormalColor` dynamic updates
+- `antiBounce: true` with `zabtUnblock()` for modal buttons
+
+All coordinates are raw px for 480×480 round screens. No external UI library needed.
+
+[example/](example/) 目录是一个**自包含**的测试程序 — 直接复制并运行 `zeus build` 即可。
+
+演示：`order` 分配（显式/自动/冲突）、`focusColor`（显式/自动）、`zabtSetLabel` / `zabtSetNormalColor` 动态修改、弹窗按钮的 `antiBounce` + `zabtUnblock`。所有坐标均为 480×480 圆屏原始 px，无需外部 UI 库。
 
 ## License
 
