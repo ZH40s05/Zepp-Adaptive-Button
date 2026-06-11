@@ -1,35 +1,34 @@
-# zabt — ZeppOS 自适应按键融合库
+# zabt — ZeppOS 自适应按键融合库 / ZeppOS Adaptive Button Library
 
 [中文](#中文) | [English](#english)
 
+---
+
 ## 中文
 
-**zabt** 将 ZeppOS 手表的物理按键（SELECT/HOME/UP/DOWN）与触摸屏按钮融合，使按键操作产生与触屏相同的视觉效果——焦点高亮、按下动画、超时撤销、触屏焦点同步。
+### 是什么
+
+**zabt** 将 ZeppOS 手表的物理按键与触摸屏按钮融合——焦点高亮、按下动画、超时撤销、触屏焦点同步。首个 `zabtBtn()` 调用自动注册按键，无需手动 `onKey`。
 
 ### 安装
 
 ```bash
 # pnpm（推荐）
 pnpm add @zh40s05/zepp-adaptive-button
-
 # npm
 npm install @zh40s05/zepp-adaptive-button
-
-# 或手动复制
+# 手动
 cp zabt.js your-app/utils/zabt.js
 ```
 
 ### 快速开始
 
-相比普通 `createWidget(widget.BUTTON, ...)` **仅两处改动**：
-
-1. 把 `createWidget(widget.BUTTON, ...)` 换成 `zabtBtn(...)`
-2. 加上可选的 `order` 字段
+相比普通按钮**仅两处改动**：换函数名、加可选 `order`。
 
 ```js
 import { zabtBtn } from '../utils/zabt'
 
-// 普通按钮 — 无需 antiBounce
+// 普通按钮
 const btn = zabtBtn({
   x: 100, y: 310, w: 280, h: 56,
   radius: 28, text_size: 28,
@@ -38,7 +37,7 @@ const btn = zabtBtn({
   order: 0,
 })
 
-// 弹窗按钮 — 需要 antiBounce
+// 弹窗按钮 — antiBounce: true
 const infoBtn = zabtBtn({
   x: 220, y: 420, w: 40, h: 40,
   radius: 20, text_size: 22,
@@ -51,138 +50,101 @@ const infoBtn = zabtBtn({
   },
   order: 1, antiBounce: true,
 })
-
-// 绑定按键
-onKey({ callback: (key, event) => zabtHandleKey(key, event) })
 ```
-
-### antiBounce — 何时使用、为什么
-
-**问题场景：** 按键触发的动作创建了一个弹窗，同一次物理按键还会产生一个尾随的 CLICK 事件。弹窗关闭后，这个残留 CLICK 会让按钮再次触发——弹窗刚关又弹出来。
-
-**解决方案：** `antiBounce: true` 在动作执行后自动阻断按键。在弹窗的 onClose 中调用 `zabtUnblock()` 释放阻断，同时丢弃恰好一次残留确认事件。
-
-| ✅ 使用 antiBounce | ❌ 不用 antiBounce |
-|---|---|
-| `createModal` 弹窗 | `showToast` 一次性提示 |
-| 需要消耗按键的 UI 层 | `launchApp` 跳转页面 |
-| | `setProperty` / 状态切换 |
-| | `console.log` |
 
 ### API
 
 | 导出 | 说明 |
 |---|---|
-| `zabtBtn(opts)` | 创建融合按钮。接受所有 `createWidget(widget.BUTTON, ...)` 字段，外加 `order`、`focusColor`、`focusSrc`、`antiBounce`。返回原生 widget。 |
-| `zabtSetLabel(w, text)` | 修改按钮文字。 |
-| `zabtSetNormalColor(w, color)` | 修改 normal 态颜色（自动重算 focusColor）。 |
-| `zabtBlock()` | 手动阻断所有按键输入。 |
-| `zabtUnblock()` | 释放阻断 + 丢弃一次残留确认事件。 |
+| `zabtBtn(opts)` | 创建融合按钮。所有 `createWidget(widget.BUTTON, ...)` 字段 + `order`/`focusColor`/`focusSrc`/`antiBounce` |
+| `zabtSetScrollConfig(cfg)` | 焦点跟随滚动 + 自动系统滚动模式配置 |
+| `zabtSetLabel(w, text)` | 修改按钮文字 |
+| `zabtSetNormalColor(w, c)` | 修改 normal 态颜色（自动重算 focusColor） |
+| `zabtBlock()` | 手动阻断按键 |
+| `zabtUnblock()` | 释放阻断 + 丢弃一次残留确认事件 |
 
-### 可选参数
+### 按钮可选参数
 
 | 参数 | 说明 |
 |---|---|
-| `order` | 导航顺序。不传按创建顺序自动补入，冲突按创建顺序后延。 |
-| `focusColor` | 高亮背景色。不传基于 `normal_color` 自动调亮（每通道 +0x28）。 |
-| `focusSrc` | 高亮图片。仅图片按钮使用，不传显示 "未定义高亮"。 |
-| `antiBounce` | `true` 用于弹窗/模态框按钮。默认 `false`。 |
+| `order` | 导航顺序。不传按创建顺序自动补入，冲突后延 |
+| `focusColor` | 高亮色。不传基于 `normal_color` 自动调亮（每通道 +0x28） |
+| `focusSrc` | 高亮图片（图片按钮）。不传显示"未定义高亮" |
+| `antiBounce` | `true` 用于弹窗/模态框按钮。默认 `false` |
+
+### antiBounce — 何时用
+
+**问题**：按键打开弹窗，同一次按键的尾随 CLICK 在弹窗关闭后重新触发按钮。
+
+**方案**：`antiBounce: true` 动作后自动阻断。弹窗关闭时调 `zabtUnblock()` 释放 + 丢弃一次残留事件。
+
+| ✅ 用 | ❌ 不用 |
+|---|---|
+| `createModal` | `showToast` |
+| 消耗按键的 UI 层 | `launchApp` |
+| | `setProperty` / 状态切换 |
+
+### 焦点跟随滚动 — `zabtSetScrollConfig`
+
+替代手动 `setScrollMode`，一次调用同时配置系统滚动模式 + 按钮焦点追踪。
+
+需 app.json 权限：`"data:os.device.info"`
+
+| 模式 | 调用 | 官方对应 |
+|---|---|---|
+| 锁定（默认） | 不调用 | — |
+| 自由滚动 | `{ mode: 'free' }` | `SCROLL_MODE_FREE` |
+| 纵向翻页 | `{ mode: 'swiper', pageCount: 3 }` | `SCROLL_MODE_SWIPER` + options.height/count |
+| 横向翻页 | `{ mode: 'swiper-h', pageCount: 3 }` | `SCROLL_MODE_SWIPER_HORIZONTAL` + options.width/count |
+
+**自动获取**（可传入覆盖）：`screenHeight`（设备屏幕高度）, `pageSize`（默认等于屏幕高度）
+
+```js
+// 自由滚动
+zabtSetScrollConfig({ mode: 'free' })
+
+// 横向翻页
+zabtSetScrollConfig({ mode: 'swiper-h', pageCount: 3 })
+```
 
 ### 行为规则
 
 - 无焦点 + SELECT → 触发 order 最小按钮
-- 无焦点 + UP → 选中 order 最小按钮
-- 无焦点 + DOWN → 选中 order 次小按钮
+- 无焦点 + UP → 选中 order 最小 / DOWN → 选中 order 次小
 - 导航边界环绕
-- SELECT 按住超过 1s → 超时撤销（日志输出按钮文字）
-- 触屏点击 → 执行动作 + 内部移动焦点（不显示高亮），之后按键恢复高亮
+- SELECT 按住 > 1s → 超时撤销（日志输出按钮文字）
+- 触屏点击 → 执行动作 + 移动内部焦点（不显示高亮），之后按键恢复
 
+### Example / 示例
 
-### Scroll-Aware Focus / 焦点跟随滚动
+[example/](example/) 自包含测试程序，直接复制运行 `zeus build`。
 
-**zabtSetScrollConfig** replaces manual `setScrollMode` — one call configures both the system scroll mode and button focus tracking.
+演示：order 分配、focusColor 自动/手动、动态修改文字颜色、antiBounce 弹窗、自由滚动、横向/纵向翻页。
 
-**zabtSetScrollConfig** 替代手动 `setScrollMode` — 一次调用同时配置系统滚动模式和按钮焦点追踪。
-
-#### Four page modes / 四种页面模式
-
-| Mode / 模式 | Config | Official API Mapping / 对应官方参数 |
-|---|---|---|
-| **Locked** | (no call / 不调用) | — |
-| **Free scroll** | `{ mode: 'free' }` | `setScrollMode({ mode: SCROLL_MODE_FREE })` |
-| **Swiper V** | `{ mode: 'swiper', pageCount: 3 }` | `setScrollMode({ mode: SCROLL_MODE_SWIPER, options: { height, count } })` |
-| **Swiper H** | `{ mode: 'swiper-h', pageCount: 3 }` | `setScrollMode({ mode: SCROLL_MODE_SWIPER_HORIZONTAL, options: { width, count } })` |
-
-**Auto-detected** (override by passing): `screenHeight` ← `getDeviceInfo().height`, `pageSize` ← `screenHeight`
-**自动获取**（可传入覆盖）：`screenHeight` ← 设备屏幕高度, `pageSize` ← 屏幕高度
-
-Requires `"data:os.device.info"` permission in app.json.
-需 app.json 声明 `"data:os.device.info"` 权限。
-
-```
-
-```js
-// Free scroll / 自由滚动
-Page({ build() {
-  zabtSetScrollConfig({ mode: 'free' })
-  // ... zabtBtn(...) ...
-}})
-
-// Swiper / 翻页
-Page({ build() {
-  zabtSetScrollConfig({ mode: 'swiper', pageCount: 3 })
-  // ... zabtBtn(...) ...
-}})
-```
-
-## Example / 示例
-
-The [example/](example/) directory is a **self-contained** test app — just copy it and run `zeus build`.
-
-It demonstrates:
-- `order` assignment (explicit, auto-fill, conflict resolution)
-- `focusColor` (explicit override vs auto-calculated)
-- `zabtSetLabel` / `zabtSetNormalColor` dynamic updates
-- `antiBounce: true` with `zabtUnblock()` for modal buttons
-
-All coordinates are raw px for 480×480 round screens. No external UI library needed.
-
-[example/](example/) 目录是一个**自包含**的测试程序 — 直接复制并运行 `zeus build` 即可。
-
-演示：`order` 分配（显式/自动/冲突）、`focusColor`（显式/自动）、`zabtSetLabel` / `zabtSetNormalColor` 动态修改、弹窗按钮的 `antiBounce` + `zabtUnblock`。所有坐标均为 480×480 圆屏原始 px，无需外部 UI 库。
-
-## License
-
-MIT © 2026 ZHAO
+---
 
 ## English
 
-**zabt** fuses physical key input (SELECT/HOME/UP/DOWN) with touchscreen buttons on ZeppOS watches, so that key presses produce the same visual feedback as touch — focus highlighting, press animation, hold-to-cancel, and touch-focus sync.
+### What
 
-### Installation
+**zabt** fuses physical keys (SELECT/HOME/UP/DOWN) with touchscreen buttons — focus highlight, press animation, hold-to-cancel, touch-focus sync. Keys are auto-registered on the first `zabtBtn()` call.
+
+### Install
 
 ```bash
-# pnpm (recommended)
 pnpm add @zh40s05/zepp-adaptive-button
-
-# npm
 npm install @zh40s05/zepp-adaptive-button
-
-# or manual copy
 cp zabt.js your-app/utils/zabt.js
 ```
 
 ### Quick Start
 
-**Only 2 changes** from a normal `createWidget(widget.BUTTON, ...)`:
-
-1. Replace `createWidget(widget.BUTTON, ...)` with `zabtBtn(...)`
-2. Add the optional `order` field
+**Only 2 changes** from a normal button: swap the function, add optional `order`.
 
 ```js
 import { zabtBtn } from '../utils/zabt'
 
-// Normal button — no antiBounce needed
+// Normal button
 const btn = zabtBtn({
   x: 100, y: 310, w: 280, h: 56,
   radius: 28, text_size: 28,
@@ -191,7 +153,7 @@ const btn = zabtBtn({
   order: 0,
 })
 
-// Modal button — needs antiBounce
+// Modal button — antiBounce: true
 const infoBtn = zabtBtn({
   x: 220, y: 420, w: 40, h: 40,
   radius: 20, text_size: 22,
@@ -204,50 +166,74 @@ const infoBtn = zabtBtn({
   },
   order: 1, antiBounce: true,
 })
-
-// Bind keys
-onKey({ callback: (key, event) => zabtHandleKey(key, event) })
 ```
-
-### antiBounce — When & Why
-
-**The problem:** when a key-triggered action creates a modal, the same physical key press generates a trailing CLICK event. After the modal closes, this residual CLICK re-triggers the action.
-
-**The solution:** `antiBounce: true` blocks key input after the action executes. Call `zabtUnblock()` in the modal's onClose — it unblocks and discards one residual confirm event.
-
-| ✅ Use antiBounce | ❌ Don't use antiBounce |
-|---|---|
-| `createModal` | `showToast` (auto-dismiss, no key interaction) |
-| Any UI layer that consumes keys | `launchApp` (page navigates away) |
-| | `setProperty` / state toggle (pure data) |
-| | `console.log` (no UI side effects) |
 
 ### API
 
 | Export | Description |
 |---|---|
-| `zabtBtn(opts)` | Create a fused button. Accepts all `createWidget(widget.BUTTON, ...)` fields plus `order`, `focusColor`, `focusSrc`, `antiBounce`. Returns the native widget. |
-| `zabtSetLabel(w, text)` | Change button text. |
-| `zabtSetNormalColor(w, color)` | Change normal-state color (auto-recalculates focusColor). |
-| `zabtBlock()` | Manually block all key input. |
-| `zabtUnblock()` | Unblock + discard one residual confirm event. |
+| `zabtBtn(opts)` | Create fused button. All `createWidget(widget.BUTTON, ...)` fields + `order`/`focusColor`/`focusSrc`/`antiBounce` |
+| `zabtSetScrollConfig(cfg)` | Scroll-aware focus + auto system scroll mode setup |
+| `zabtSetLabel(w, text)` | Change button text |
+| `zabtSetNormalColor(w, c)` | Change normal color (auto-recalc focusColor) |
+| `zabtBlock()` | Manually block key input |
+| `zabtUnblock()` | Unblock + discard one residual confirm event |
 
-### Optional Fields
+### Button Options
 
 | Field | Description |
 |---|---|
-| `order` | Navigation sequence. Auto-assigned by creation order if omitted; conflicts shift later-created buttons. |
-| `focusColor` | Highlight background color. Auto-calculated from `normal_color` (+0x28 per channel) if omitted. |
-| `focusSrc` | Highlight image (image buttons only). Falls back to "未定义高亮" text. |
-| `antiBounce` | `true` for buttons that create modals/popups. Default `false`. |
+| `order` | Navigation order. Auto-assigned if omitted, conflicts shift later |
+| `focusColor` | Highlight color. Auto-calc from `normal_color` (+0x28/channel) |
+| `focusSrc` | Highlight image (image buttons). Falls back to "未定义高亮" |
+| `antiBounce` | `true` for modal/popup buttons. Default `false` |
+
+### antiBounce — When & Why
+
+**Problem**: key-triggered modal → trailing CLICK re-triggers after close.
+
+**Solution**: `antiBounce: true` auto-blocks after action. Call `zabtUnblock()` on modal close.
+
+| ✅ Use | ❌ Don't |
+|---|---|
+| `createModal` | `showToast` |
+| Any key-consuming UI | `launchApp` |
+| | `setProperty` / state toggle |
+
+### Scroll-Aware Focus — `zabtSetScrollConfig`
+
+Replaces manual `setScrollMode`. One call = system scroll mode + focus tracking.
+
+Requires `"data:os.device.info"` in app.json.
+
+| Mode | Config | Official API |
+|---|---|---|
+| Locked (default) | (no call) | — |
+| Free scroll | `{ mode: 'free' }` | `SCROLL_MODE_FREE` |
+| Swiper V | `{ mode: 'swiper', pageCount: 3 }` | `SCROLL_MODE_SWIPER` + height/count |
+| Swiper H | `{ mode: 'swiper-h', pageCount: 3 }` | `SCROLL_MODE_SWIPER_HORIZONTAL` + width/count |
+
+**Auto-detected** (override by passing): `screenHeight`, `pageSize` (defaults to screenHeight)
+
+```js
+zabtSetScrollConfig({ mode: 'free' })
+zabtSetScrollConfig({ mode: 'swiper-h', pageCount: 3 })
+```
 
 ### Behavior
 
-- No focus + SELECT → triggers smallest-order button
-- No focus + UP → selects smallest-order button
-- No focus + DOWN → selects second-smallest-order button
-- Navigation wraps at boundaries
+- No focus + SELECT → smallest-order button
+- No focus + UP → smallest / DOWN → second-smallest
+- Navigation wraps
 - SELECT held > 1s → cancelled (logs button text)
-- Touch-click → execute + move internal focus (no highlight); subsequent keys restore highlight
+- Touch-click → execute + move focus (no highlight), keys restore highlight
 
----
+### Example
+
+[example/](example/) — self-contained test app with 4 page modes.
+
+Demos: order, focusColor, dynamic updates, antiBounce modal, free scroll, swiper-h, swiper-v.
+
+## License
+
+MIT © 2026 ZHAO
