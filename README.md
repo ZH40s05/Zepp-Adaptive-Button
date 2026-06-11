@@ -106,25 +106,31 @@ onKey({ callback: (key, event) => zabtHandleKey(key, event) })
 
 #### Four page modes / 四种页面模式
 
-| Mode / 模式 | Config | Behavior / 行为 |
+| Mode / 模式 | Config | Official API Mapping / 对应官方参数 |
 |---|---|---|
-| **Locked** 锁定不滚动 | (no call / 不调用) | Content fits one screen / 内容在一屏内 |
-| **Free scroll** 自由滚动 | `{ mode: 'free', screenHeight: 480 }` | Focus stays in safe zone (1/6~5/6), smooth scroll animation / 焦点保持在安全区，平滑滚动 |
-| **Swiper V** 纵向翻页 | `{ mode: 'swiper', screenHeight: 480, pageSize: 480, pageCount: 3 }` | Auto-flip to page containing focused button / 焦点跨页自动翻页 |
-| **Swiper H** 横向翻页 | `{ mode: 'swiper-h', screenHeight: 480, pageSize: 480, pageCount: 3 }` | Auto-flip to page containing focused button / 焦点跨页自动翻页 |
+| **Locked** | (no call / 不调用) | — |
+| **Free scroll** | `{ mode: 'free' }` | `setScrollMode({ mode: SCROLL_MODE_FREE })` |
+| **Swiper V** | `{ mode: 'swiper', pageCount: 3 }` | `setScrollMode({ mode: SCROLL_MODE_SWIPER, options: { height, count } })` |
+| **Swiper H** | `{ mode: 'swiper-h', pageCount: 3 }` | `setScrollMode({ mode: SCROLL_MODE_SWIPER_HORIZONTAL, options: { width, count } })` |
+
+**Auto-detected** (override by passing): `screenHeight` ← `getDeviceInfo().height`, `pageSize` ← `screenHeight`
+**自动获取**（可传入覆盖）：`screenHeight` ← 设备屏幕高度, `pageSize` ← 屏幕高度
+
+Requires `"data:os.device.info"` permission in app.json.
+需 app.json 声明 `"data:os.device.info"` 权限。
 
 ```
 
 ```js
 // Free scroll / 自由滚动
 Page({ build() {
-  zabtSetScrollConfig({ mode: 'free', screenHeight: 480 })
+  zabtSetScrollConfig({ mode: 'free' })
   // ... zabtBtn(...) ...
 }})
 
 // Swiper / 翻页
 Page({ build() {
-  zabtSetScrollConfig({ mode: 'swiper', screenHeight: 480, pageSize: 480, pageCount: 3 })
+  zabtSetScrollConfig({ mode: 'swiper', pageCount: 3 })
   // ... zabtBtn(...) ...
 }})
 ```

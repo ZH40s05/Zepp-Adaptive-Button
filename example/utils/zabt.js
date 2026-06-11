@@ -175,10 +175,24 @@
  *      横向翻页 — 页面横向翻页，焦点跨页时自动翻页
  *
  * Config fields / 配置字段:
- *   mode      — 'free' | 'swiper' | 'swiper-h'
- *   pageCount — number of swiper pages (default: 1)
- *   (screenHeight & pageSize are auto-detected, override by passing them)
- *   (screenHeight & pageSize 自动获取，可手动传入覆盖)
+ *
+ *   mode       — 'free' | 'swiper' | 'swiper-h' (required / 必填)
+ *   pageCount  — swiper page count (default: 1 / 默认 1)
+ *
+ *   The following are AUTO-DETECTED. Pass them only when you need a custom value.
+ *   以下字段自动获取，仅在需要覆盖时手动传入：
+ *
+ *   screenHeight — device screen height (auto: getDeviceInfo().height)
+ *                   屏幕高度（自动获取）
+ *   pageSize     — swiper page height or width (auto: screenHeight)
+ *                   swiper 每页高度/宽度（自动等于屏幕高度）
+ *
+ *   Mapping to official setScrollMode / 对应官方 setScrollMode 参数:
+ *     free mode → setScrollMode({ mode: SCROLL_MODE_FREE })     // no extra params
+ *     swiper    → setScrollMode({ mode: SCROLL_MODE_SWIPER,     // height=pageSize
+ *                                 options: { height, count } })
+ *     swiper-h  → setScrollMode({ mode: SCROLL_MODE_SWIPER_H,   // width=pageSize
+ *                                 options: { width, count } })
  *
  * @example
  * // Free scroll / 自由滚动
