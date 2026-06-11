@@ -147,11 +147,15 @@
  * Scroll-Aware Focus / 焦点跟随滚动
  * ============================================================================
  *
+ * [EN] Requires "data:os.device.info" permission in app.json for auto-detect.
+ *     需要 app.json 中声明 "data:os.device.info" 权限以自动获取屏幕尺寸。
+ *
  * [EN] zabtSetScrollConfig replaces manual setScrollMode calls. It configures
  * both the system scroll mode AND the button focus tracking in one call.
+ * screenHeight and pageSize are auto-detected from device info.
  *
  * [CN] zabtSetScrollConfig 替代手动 setScrollMode 调用。一次调用同时配置系统
- * 滚动模式和按钮焦点追踪。
+ * 滚动模式和按钮焦点追踪。screenHeight 和 pageSize 自动从设备信息获取。
  *
  * Four page modes / 四种页面模式:
  *
@@ -159,29 +163,29 @@
  *      锁定不滚动（默认）— 不调用，内容在一屏内
  *
  *   2. FREE SCROLL — page scrolls freely, focus stays in safe zone
- *      zabtSetScrollConfig({ mode: 'free', screenHeight: 480 })
+ *      zabtSetScrollConfig({ mode: 'free' })
  *      自由滚动 — 页面自由滚动，焦点保持在安全区(1/6~5/6 屏幕)
  *
  *   3. SWIPER VERTICAL — page flips vertically, auto-flip on focus
- *      zabtSetScrollConfig({ mode: 'swiper', screenHeight: 480, pageSize: 480, pageCount: 3 })
+ *      zabtSetScrollConfig({ mode: 'swiper', pageCount: 3 })
  *      纵向翻页 — 页面纵向翻页，焦点跨页时自动翻页
  *
  *   4. SWIPER HORIZONTAL — page flips horizontally, auto-flip on focus
- *      zabtSetScrollConfig({ mode: 'swiper-h', screenHeight: 480, pageSize: 480, pageCount: 3 })
+ *      zabtSetScrollConfig({ mode: 'swiper-h', pageCount: 3 })
  *      横向翻页 — 页面横向翻页，焦点跨页时自动翻页
  *
  * Config fields / 配置字段:
- *   mode         — 'free' | 'swiper' | 'swiper-h'
- *   screenHeight — device screen height (required for free/swiper)
- *   pageSize     — swiper page height/width (default: screenHeight)
- *   pageCount    — number of swiper pages (default: 1)
+ *   mode      — 'free' | 'swiper' | 'swiper-h'
+ *   pageCount — number of swiper pages (default: 1)
+ *   (screenHeight & pageSize are auto-detected, override by passing them)
+ *   (screenHeight & pageSize 自动获取，可手动传入覆盖)
  *
  * @example
  * // Free scroll / 自由滚动
- * zabtSetScrollConfig({ mode: 'free', screenHeight: 480 })
+ * zabtSetScrollConfig({ mode: 'free' })
  *
  * // Swiper horizontal / 横向翻页
- * zabtSetScrollConfig({ mode: 'swiper-h', screenHeight: 480, pageSize: 480, pageCount: 3 })
+ * zabtSetScrollConfig({ mode: 'swiper-h', pageCount: 3 })
  *
  * ============================================================================
  * Behavior Rules / 行为规则
@@ -226,6 +230,7 @@
 import { createWidget, widget, prop } from '@zos/ui'
 import { onKey, KEY_SELECT, KEY_HOME, KEY_UP, KEY_DOWN, KEY_EVENT_CLICK, KEY_EVENT_PRESS, KEY_EVENT_RELEASE } from '@zos/interaction'
 import { scrollTo, getScrollTop, getSwiperIndex, swipeToIndex, setScrollMode, SCROLL_MODE_FREE, SCROLL_MODE_SWIPER, SCROLL_MODE_SWIPER_HORIZONTAL } from '@zos/page'
+import { getDeviceInfo } from '@zos/device'
 
 const DEFAULT_FOCUS = 0x5B6B80
 const NO_FOCUS_IMG = '未定义高亮'
@@ -528,22 +533,19 @@ export function zabtHandleKey(key, event) {
 }
 
 export function zabtSetScrollConfig(cfg) {
-  _scrollCfg = cfg
+  const dev = getDeviceInfo()
+  const sh = cfg.screenHeight || dev.height
+  const ps = cfg.pageSize || sh
+
+  _scrollCfg = { mode: cfg.mode, screenHeight: sh, pageSize: ps, pageCount: cfg.pageCount }
   _trackedST = null
 
-  // Auto-configure system scroll mode / 自动配置系统滚动模式
   if (cfg.mode === 'free') {
     setScrollMode({ mode: SCROLL_MODE_FREE })
   } else if (cfg.mode === 'swiper') {
-    setScrollMode({
-      mode: SCROLL_MODE_SWIPER,
-      options: { height: cfg.pageSize || cfg.screenHeight, count: cfg.pageCount || 1 },
-    })
+    setScrollMode({ mode: SCROLL_MODE_SWIPER, options: { height: ps, count: cfg.pageCount || 1 } })
   } else if (cfg.mode === 'swiper-h') {
-    setScrollMode({
-      mode: SCROLL_MODE_SWIPER_HORIZONTAL,
-      options: { width: cfg.pageSize || cfg.screenWidth || 480, count: cfg.pageCount || 1 },
-    })
+    setScrollMode({ mode: SCROLL_MODE_SWIPER_HORIZONTAL, options: { width: ps, count: cfg.pageCount || 1 } })
   }
 }
 
