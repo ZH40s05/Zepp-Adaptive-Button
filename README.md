@@ -8,7 +8,15 @@
 
 ### 是什么
 
-**zabt** 将 ZeppOS 手表的物理按键与触摸屏按钮融合——焦点高亮、按下动画、超时撤销、触屏焦点同步。首个 `zabtBtn()` 调用自动注册按键，无需手动 `onKey`。
+**zabt** 将 ZeppOS 手表物理按键与触摸屏按钮融合，提供五大功能：
+
+1. **按键融合** — 物理按键产生与触屏相同的视觉效果（高亮、按下色）
+2. **焦点导航** — UP/DOWN 在按钮间导航，SELECT/HOME 确认触发
+3. **防回弹** — 弹窗按钮 `antiBounce: true` 阻止残留事件重复触发
+4. **触屏同步** — 触屏点击按钮后自动移动按键焦点
+5. **焦点跟随滚动** — 自由滚动/Swiper 翻页时自动滚动至聚焦按钮（含平滑动画）
+
+首个 `zabtBtn()` 自动注册按键，无需手动 `onKey`。
 
 ### 安装
 
@@ -127,7 +135,15 @@ zabtSetScrollConfig({ mode: 'swiper-h', pageCount: 3 })
 
 ### What
 
-**zabt** fuses physical keys (SELECT/HOME/UP/DOWN) with touchscreen buttons — focus highlight, press animation, hold-to-cancel, touch-focus sync. Keys are auto-registered on the first `zabtBtn()` call.
+**zabt** fuses physical keys with touchscreen buttons. Five features:
+
+1. **Button Fusion** — keys produce the same visual feedback as touch (highlight, press color)
+2. **Focus Navigation** — UP/DOWN navigate buttons, SELECT/HOME confirm
+3. **Anti-Bounce** — `antiBounce: true` prevents modal double-trigger from residual events
+4. **Touch-Focus Sync** — touching a button moves key focus to it
+5. **Scroll-Aware Focus** — auto-scrolls (free scroll) or auto-flips (swiper) to keep focused button visible, with custom smooth animation
+
+Keys are auto-registered on the first `zabtBtn()` call — no manual `onKey` needed.
 
 ### Install
 
