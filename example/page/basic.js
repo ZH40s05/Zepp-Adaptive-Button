@@ -1,7 +1,7 @@
 import { createWidget, widget } from '@zos/ui'
-import { showToast, onKey, createModal } from '@zos/interaction'
+import {showToast, createModal} from '@zos/interaction'
 import { back } from '@zos/router'
-import { zabtBtn, zabtSetLabel, zabtSetNormalColor, zabtHandleKey, zabtUnblock } from '../utils/zabt'
+import { zabtBtn, zabtSetLabel, zabtSetNormalColor, zabtUnblock } from '../utils/zabt'
 
 let toggleState = false
 let modalCount = 0
@@ -130,6 +130,5 @@ Page({
       order: 99,
     })
 
-    onKey({ callback: (key, event) => zabtHandleKey(key, event) })
   },
 })

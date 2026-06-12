@@ -1,7 +1,7 @@
 import { createWidget, widget } from '@zos/ui'
-import { showToast, onKey } from '@zos/interaction'
+import {showToast} from '@zos/interaction'
 import { back } from '@zos/router'
-import { zabtBtn, zabtSetScrollConfig, zabtHandleKey } from '../utils/zabt'
+import { zabtBtn, zabtSetScrollConfig } from '../utils/zabt'
 
 const SH = 480
 
@@ -14,7 +14,10 @@ Page({
     // zabtSetScrollConfig handles both system setup + focus tracking.
     // 3 页堆叠，每页 480px。导航到其他页按钮时自动翻页。
     // =================================================================
-    zabtSetScrollConfig({ mode: 'swiper', screenHeight: 480, pageSize: 480, pageCount: 3 })
+        // SWIPER V: height auto-detected (=screenHeight). Official API needs setScrollMode options.height.
+    // 高度自动获取。官方 API 需 setScrollMode options.height。
+    // Override: zabtSetScrollConfig({ mode: 'swiper', pageSize: 400, pageCount: 3 })
+    zabtSetScrollConfig({ mode: 'swiper', pageCount: 3 })
 
     createWidget(widget.TEXT, {
       x: 60, y: 20, w: 360, h: 36,
@@ -84,6 +87,5 @@ Page({
       order: 99, antiBounce: true,
     })
 
-    onKey({ callback: (key, event) => zabtHandleKey(key, event) })
   },
 })

@@ -1,7 +1,6 @@
 import { createWidget, widget } from '@zos/ui'
-import { onKey } from '@zos/interaction'
 import { push } from '@zos/router'
-import { zabtBtn, zabtSetScrollConfig, zabtHandleKey } from '../utils/zabt'
+import { zabtBtn, zabtSetScrollConfig } from '../utils/zabt'
 
 Page({
   build() {
@@ -11,7 +10,10 @@ Page({
     // Also enables custom smooth scroll animation.
     // 按键导航时按钮保持在屏幕安全区 (1/6 ~ 5/6)，含自定义平滑滚动动画。
     // =================================================================
-    zabtSetScrollConfig({ mode: 'free', screenHeight: 480 })
+        // FREE SCROLL: screenHeight auto-detected. Official API needs no extra params.
+    // 屏幕高度自动获取。官方 API 无需额外参数。
+    // Override: zabtSetScrollConfig({ mode: 'free', screenHeight: 480 })
+    zabtSetScrollConfig({ mode: 'free' })
 
     createWidget(widget.TEXT, {
       x: 60, y: 30, w: 360, h: 40,
@@ -84,6 +86,5 @@ Page({
       text_size: 15, color: 0x6B7280, text_style: 2,
     })
 
-    onKey({ callback: (key, event) => zabtHandleKey(key, event) })
   },
 })
