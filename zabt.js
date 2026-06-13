@@ -2,7 +2,7 @@
  * zabt.js — ZeppOS Adaptive Button Library
  * ZeppOS 自适应按键融合库
  *
- * @version 1.0.0
+ * @version 1.2.2
  * @date    2026/06/11
  * @author  ZHAO
  * @license MIT
